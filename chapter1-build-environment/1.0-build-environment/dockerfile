@@ -2,7 +2,7 @@
 FROM nvcr.io/nvidia/tensorrt:21.12-py3   
 
 ENV TZ=Asia/Tokyo
-ARG user=trt-starter
+ARG user=zhen
 
 # Set timezone in case of interation during installation
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -70,6 +70,30 @@ RUN apt-get update
 # copy dotfiles
 COPY my_dot_files/tmux/* /home/${user}/
 COPY my_dot_files/fish/ /home/${user}/.config/fish
+
+# denpendencies for neovim
+# Install nvm
+# RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+COPY install.sh /home/${user}/
+RUN bash /home/${user}/install.sh
+
+# Install Node.js
+RUN export NVM_DIR="$HOME/.nvm" && \
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
+  nvm install 20
+
+# Verify Node.js and npm installation
+RUN export NVM_DIR="$HOME/.nvm" && \
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && \
+  node --version && npm --version
+
+# install neovim
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+RUN rm -rf /opt/nvim
+RUN tar -C /opt -xzf nvim-linux64.tar.gz
+RUN echo "set -gx PATH $PATH /opt/nvim-linux64/bin" >> /home/${user}/.config/fish/config.fish
+
+COPY my_dot_files/nvim/ /home/${user}/.config/nvim
 
 # set working directory of trt webinar
 RUN mkdir -p /home/${user}/workspace/
