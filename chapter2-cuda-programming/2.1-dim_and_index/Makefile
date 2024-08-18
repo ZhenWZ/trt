@@ -6,8 +6,8 @@ include $(CONFIG_LOCAL)
 
 BUILD_PATH    :=  build
 SRC_PATH      :=  src
-# CUDA_DIR      :=  /usr/local/cuda-$(CUDA_VER)
-CUDA_DIR			:= /usr
+CUDA_DIR      :=  /usr/local/cuda
+# CUDA_DIR			:= /usr
 
 KERNELS_SRC   :=  $(wildcard $(SRC_PATH)/*.cu)
 
